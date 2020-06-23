@@ -12,33 +12,29 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	UserDetailsService userDetailsService;
-	
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// TODO Auto-generated method stub
-		auth.userDetailsService(userDetailsService);
-	}
+    @Autowired
+    UserDetailsService userDetailsService;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+    }
 
-		http.authorizeRequests()
-				.antMatchers("/user").hasAnyRole("USER","ADMIN")
-				.antMatchers("/admin").hasRole("ADMIN")
-				.antMatchers("/").permitAll()
-				.and().formLogin();
-	}
-	
-	//password encoder
-	
-	@Bean
-	public PasswordEncoder getPasswordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
-	}
-	
-	
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        	http.authorizeRequests()
+        	//In Database ROLES column values should be like 'ROLE_ADMIN'
+                .antMatchers("/admin").hasRole("ADMIN")
+                .antMatchers("/user").hasAnyRole("ADMIN", "USER")
+                .antMatchers("/").permitAll()
+                .and().formLogin();
+        
+    }
+
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
 }
